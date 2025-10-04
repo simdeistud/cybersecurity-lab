@@ -1,6 +1,8 @@
+requests
 numpy
 pandas
 pandas-stubs
 matplotlib
 openpyxl
 seaborn
+plotly
