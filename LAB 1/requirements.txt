@@ -6,3 +6,5 @@ matplotlib
 openpyxl
 seaborn
 plotly
+scikit-learn
+automl_gs
