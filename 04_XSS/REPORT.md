@@ -33,7 +33,7 @@ By substituting into the URL our HTML payload, we solve the challenge.
 
 ### 1. DOM vulnerability
 
-By browsing the application's code, we find out in the routing module that the componen responsible for the main search
+By browsing the application's code, we find out in the routing module that the component responsible for the main search
 page is `search-result.component.ts`. By looking at this file we find out that when the page loads, all items are downloaded
 at once, and further requests are only made for specific reasons such as retrieving the description of an item when opened.
 This in turn means, and can be verified with BURP, that searching for products is an entirely local operation done by the 
