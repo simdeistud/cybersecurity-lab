@@ -6,7 +6,7 @@ In this report, the OWASP Juice Shop webapp is used to showcase the exploitation
 
 - OWASP Juice Shop
 - BURP Suite Proxy
-- 
+
 ## Challenge #1. DOM XSS attack
 
 For this challenge, we will try to look for an input field where its content appears in the HTML when its form is submitted.
