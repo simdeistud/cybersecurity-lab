@@ -167,7 +167,7 @@ We start by extracting some interesting statistics about the CVEs that have been
 
 - ### Show a bar plot with the daily volume of published CVEs
     
-![png](LAB_EPSS_files/LAB_EPSS_15_0.png)
+![png](REPORT_FILES/LAB_EPSS_15_0.png)
     
 - ### Print the description of the last ten published vulnerabilities
 
@@ -239,11 +239,11 @@ candidate_cves_df["cvss_baseScore"].describe()
     max        10.000000
     Name: cvss_baseScore, dtype: float64
   
-![png](LAB_EPSS_files/LAB_EPSS_28_1.png)
+![png](REPORT_FILES/LAB_EPSS_28_1.png)
 
 It would seem that a relatively high number of CVEs published in september 2025 have a very high CVSS.
     
-![png](LAB_EPSS_files/LAB_EPSS_30_0.png)
+![png](REPORT_FILES/LAB_EPSS_30_0.png)
 
 - ### Report descriptive statistics of EPSS and/or show its distribution
 
@@ -264,20 +264,20 @@ candidate_cves_df["epss"].describe()
     max         0.831590
     Name: epss, dtype: float64
 
-![png](LAB_EPSS_files/LAB_EPSS_34_0.png)
+![png](REPORT_FILES/LAB_EPSS_34_0.png)
     
 It is evident that, except for a couple of outliers, on average the EPSS is extremely low.
 
 - ### Produce a scatter plot showing CVSS vs EPSS
-![png](LAB_EPSS_files/LAB_EPSS_37_0.png)
+![png](REPORT_FILES/LAB_EPSS_37_0.png)
     
 As we can see, the CVSS and EPSS are not really related with each other, even though the only times the EPSS is high enough, it's in the presence of an equally high CVSS. We can further visualize this lack of correlation with a correlation matrix:
 
-![png](LAB_EPSS_files/LAB_EPSS_39_0.png)
+![png](REPORT_FILES/LAB_EPSS_39_0.png)
     
 - ### Extra analysis - Top 20 most frequent vendors
    
-![png](LAB_EPSS_files/LAB_EPSS_42_0.png)
+![png](REPORT_FILES/LAB_EPSS_42_0.png)
 
 ## CVE Selection Process
 
@@ -400,11 +400,11 @@ def total_gain(values):
 
 As we can see from the following plots, CVEs tend to start with an EPSS score sitting in the 10%. It is also evident how the mean daily gain and total gain over the first 90 days after publishing sit close to zero, meaning the vast majority of CVEs do not increase their threat level.
     
-![png](LAB_EPSS_files/LAB_EPSS_78_0.png)
+![png](REPORT_FILES/LAB_EPSS_78_0.png)
         
-![png](LAB_EPSS_files/LAB_EPSS_78_1.png)
+![png](REPORT_FILES/LAB_EPSS_78_1.png)
      
-![png](LAB_EPSS_files/LAB_EPSS_78_2.png)
+![png](REPORT_FILES/LAB_EPSS_78_2.png)
 
 ### Model selection, training, and prediction
 We have chosen a 2-step approach to filtering the candidate CVEs based on ML models. First we filter based on an outlier detector, and then we order the remaining CVEs by the predicted metrics from a regression model.
@@ -1090,7 +1090,7 @@ By manual inspection, we also exclude CVE-2025-7445 and CVE-2025-59934 since the
 ### Tracking my CVEs
 As we can see, the chosen CVEs using this method have not been proven particularly successful.
    
-![png](LAB_EPSS_files/LAB_EPSS_116_0.png)
+![png](REPORT_FILES/LAB_EPSS_116_0.png)
 
 ## Disclosure
 Some LLMs have been used to write parts of the python code for this lab activity.
