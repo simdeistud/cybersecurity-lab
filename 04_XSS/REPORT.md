@@ -10,7 +10,7 @@ In this report, the OWASP Juice Shop webapp is used to showcase the exploitation
 ## Challenge #1. DOM XSS attack
 
 For this challenge, we will try to look for an input field where its content appears in the HTML when its form is submitted.
-By examining at the main store page we notice a search bar on the top right. By pasting the payload HTML `<iframe src="javascript:alert(`xss`)">`
+By examining at the main store page we notice a search bar on the top right. By pasting the payload HTML `<iframe src="javascript:alert('xss')">`
 and performing the search, we successfully complete the challenge.
 
 ![scrsh1.png](REPORT_FILES/scrsh1.png)
