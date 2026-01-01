@@ -239,7 +239,7 @@ pkt = sniff(iface="eth0", filter = f, prn = spoof_pkt)
 The code above captures all the TCP packets related to A, and then for packets from A to B,
 it changes all letters to a `Z` and runs successfully.
 
-##  Task 3. MITM Attack on Netcat using ARP Cache Poisoning
+##  Task #3. MITM Attack on Netcat using ARP Cache Poisoning
 This task is similar to Task 2, except that Hosts A and B are communicating using netcat, instead of
 telnet. Host M wants to intercept their communication, so it can make changes to the data sent between
 A and B. We use the following commands to establish a netcat TCP connection between A and B:
